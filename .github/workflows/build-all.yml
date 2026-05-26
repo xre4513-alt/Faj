@@ -1,23 +1,23 @@
-name: Ultimate Single File Android Builder
+name: Ultimate Automatic Android Builder
 
+# Yeh section handle karta hai ki workflow kab chalega
 on:
-  push:
-    branches: [ "main", "master" ]
-  workflow_dispatch: # Isse GitHub UI me 'Run workflow' ka button dikhega
+  push:      # Jaise hi tum code push ya save karoge, yeh automatic chalega
+  workflow_dispatch: # Backup ke liye button bhi rahega
 
 jobs:
   create-and-build:
     runs-on: ubuntu-latest
 
     steps:
-    # 1. Agar repo khali hai toh error na aaye, isliye init step
-    - name: Initialize Git if Repository is Empty
+    # 1. Khali repository ke error se bachne ke liye Git initialize karna
+    - name: Initialize Git
       run: |
         git init
         git config user.name "github-actions"
         git config user.email "github-actions@github.com"
 
-    # 2. Project Structure aur Files On-The-Fly Generate karna
+    # 2. Saari files ko workflow ke andar hi automatic generate karna
     - name: Generate Android Project Structure
       run: |
         echo "Creating folders..."
@@ -173,29 +173,30 @@ jobs:
             }
         }
         EOF
-        echo "All project setup complete!"
+        echo "Project dynamic setup completed successfully!"
 
-    # 3. Java 17 Set up karna
+    # 3. Java Environment ready karna
     - name: Set up JDK 17
       uses: actions/setup-java@v4
       with:
         java-version: '17'
         distribution: 'temurin'
 
-    # 4. Gradle tool download aur execution permission dena
+    # 4. Gradle tool deploy karna
     - name: Setup Gradle Wrapper
       run: |
         gradle wrapper --gradle-version 8.5
         chmod +x gradlew
 
-    # 5. APK Compile karna
+    # 5. Build Process run karna
     - name: Build Android Debug APK
       run: ./gradlew assembleDebug
 
-    # 6. Artifact Upload (Taaki download link mile)
+    # 6. Output Downloadable link create karna
     - name: Upload Final APK
       uses: actions/upload-artifact@v4
       with:
         name: OneClick-NotificationApp
         path: app/build/outputs/apk/debug/app-debug.apk
         retention-days: 5
+        
